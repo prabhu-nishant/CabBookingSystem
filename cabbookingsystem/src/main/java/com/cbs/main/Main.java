@@ -48,25 +48,25 @@ public class Main {
 		req1.setBookingId("BR001");
 		req1.setPickUpArea(100025);
 		req1.setDropArea(100036);
-		req1.setPickUpTime(TimeGenerator.getDate("26/08/2015 2:50 pm"));
+		req1.setPickUpTime(TimeGenerator.getDate("26/08/2015 10:45 pm"));
 				
 		BookingRequest req2 = new BookingRequest();
 		req2.setBookingId("BR002");
 		req2.setPickUpArea(100056);
 		req2.setDropArea(100042);
-		req2.setPickUpTime(TimeGenerator.getDate("26/08/2015 4:00 pm"));
+		req2.setPickUpTime(TimeGenerator.getDate("26/08/2015 10:00 pm"));
 		
 		BookingRequest req3 = new BookingRequest();
 		req3.setBookingId("BR003");
 		req3.setPickUpArea(100044);
 		req3.setDropArea(100056);
-		req3.setPickUpTime(TimeGenerator.getDate("26/08/2015 4:00 pm"));
+		req3.setPickUpTime(TimeGenerator.getDate("26/08/2015 11:00 pm"));
 		
 		BookingRequest req4 = new BookingRequest();
 		req4.setBookingId("BR004");
 		req4.setPickUpArea(100028);
 		req4.setDropArea(100058);
-		req4.setPickUpTime(TimeGenerator.getDate("26/08/2015 9:00 pm"));
+		req4.setPickUpTime(TimeGenerator.getDate("26/08/2015 11:30 pm"));
 		
 		
 		list.add(req1);

@@ -17,14 +17,6 @@ import com.cbs.constants.Constants;
  */
 public class TimeGenerator {
 	
-	public static String getDateInFormat(Date now) {
-		
-		DateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT);
-		
-		return (now!=null?sdf.format(now):null);
-	}
-	
-	
 	public static Date getDate(String dateString) {
 		
 		Date date = null;
@@ -66,7 +58,6 @@ public class TimeGenerator {
 	public static Date getDifferentTime(Date date,int minutes){
 		
 		Calendar cal = Calendar.getInstance();
-		DateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT);
 		cal.setTime(date);
 		cal.add(Calendar.MINUTE, minutes);
 		return cal.getTime();
