@@ -1,7 +1,5 @@
 package com.cbs.process;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -10,7 +8,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.cbs.constants.Constants;
 import com.cbs.model.BookingRequest;
 import com.cbs.model.Cab;
 import com.cbs.model.Schedule;
