@@ -7,20 +7,26 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.cbs.model.BookingRequest;
 import com.cbs.model.Cab;
 import com.cbs.model.Schedule;
 import com.cbs.utils.TimeGenerator;
 
-
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(TimeGenerator.class)
 public class ProcessRequestImplTest {
 
 	ProcessRequestImpl systemUnderTest;
-	
+
 	@Before
 	public void setUp(){
 		
+		PowerMockito.mockStatic(TimeGenerator.class);
 		systemUnderTest = new ProcessRequestImpl();
 	}
 	
