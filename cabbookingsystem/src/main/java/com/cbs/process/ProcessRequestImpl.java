@@ -83,7 +83,7 @@ public class ProcessRequestImpl implements ProcessRequest{
 			Schedule schedule = null;
 			List<Schedule> scheduleList = cab.getScheduleList();
 			
-			if(scheduleList!=null && scheduleList.size()!=0){
+			if(scheduleList.size()!=0){
 				
 				for(int i = 0;i<scheduleList.size();i++){
 					
