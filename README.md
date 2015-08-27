@@ -16,6 +16,10 @@
 
 8. The current or initial location of the cab is updated with the pincode everytime a schedule is completed and this is picked up when we try to build the map at start of each batch sequence.
 
+9. It is not guranteed that all the requests in the batch will be booked. If the criteria for profit and time is not met then request can still be in pending state.
+
+
+
 
 
 
