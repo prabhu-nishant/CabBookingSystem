@@ -7,39 +7,47 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import com.cbs.model.BookingRequest;
 import com.cbs.model.Cab;
 import com.cbs.model.Schedule;
 import com.cbs.utils.TimeGenerator;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(TimeGenerator.class)
 public class ProcessRequestImplTest {
 
 	ProcessRequestImpl systemUnderTest;
-
+	
+	@Mock
+	Calendar c;
+	
 	@Before
 	public void setUp(){
 		
-		PowerMockito.mockStatic(TimeGenerator.class);
+		c = Mockito.mock(Calendar.class);
 		systemUnderTest = new ProcessRequestImpl();
 	}
 	
 	@Test
-	public void testProcessRequest() {
+	public void testOldProcessRequest() {
 		
 		BookingRequest request = new BookingRequest();
 		request.setBookingId("BR001");
 		request.setPickUpArea(100025);
 		request.setDropArea(100036);
-		Calendar cal = Calendar.getInstance();
+		
+		Calendar cal = getCalendar();
 		cal.add(Calendar.DATE, -1);
 		request.setPickUpTime(cal.getTime());
+		
+		Mockito.when(c.getTime()).thenAnswer(new Answer() {
+			 public Object answer(InvocationOnMock invocation) {   
+			     return getCalendar().getTime();
+			 }
+		});
 		
 		systemUnderTest.processRequest(request, getCabList());
 		Assert.assertEquals("Request Status invalid","-",request.getStatus() );
@@ -54,16 +62,18 @@ public class ProcessRequestImplTest {
 		request.setBookingId("BR001");
 		request.setPickUpArea(100025);
 		request.setDropArea(100036);
-		
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MINUTE, -1);
-		
+		Calendar cal = getCalendar();
+		cal.add(Calendar.MINUTE, -50);
 		request.setPickUpTime(cal.getTime());
 		
+		Mockito.when(c.getTime()).thenAnswer(new Answer() {
+			 public Object answer(InvocationOnMock invocation) {   
+			     return getCalendar().getTime();
+			 }
+		});
 		systemUnderTest.processRequest(request, getCabList());
 		Assert.assertEquals("Request Status invalid","-",request.getStatus() );
 		Assert.assertEquals("Request Status description invalid ","Request cannot be completed as it is expired" ,request.getStatusDescription());
-		
 	}
 	
 	@Test
@@ -74,10 +84,16 @@ public class ProcessRequestImplTest {
 		request.setPickUpArea(100025);
 		request.setDropArea(100036);
 		
-		Calendar cal = Calendar.getInstance();
+		Calendar cal = getCalendar();
 		cal.add(Calendar.MINUTE,27);
 		
 		request.setPickUpTime(cal.getTime());
+		
+		Mockito.when(c.getTime()).thenAnswer(new Answer() {
+			 public Object answer(InvocationOnMock invocation) {   
+			     return getCalendar().getTime();
+			 }
+		});
 		
 		systemUnderTest.processRequest(request, getCabList());
 		Assert.assertEquals("Request Status invalid","Booked",request.getStatus() );
@@ -95,10 +111,15 @@ public class ProcessRequestImplTest {
 		request.setPickUpArea(100022);
 		request.setDropArea(100027);
 		
-		Calendar cal = Calendar.getInstance();
+		Calendar cal = getCalendar();
 		cal.add(Calendar.MINUTE,50);
-		
 		request.setPickUpTime(cal.getTime());
+		
+		Mockito.when(c.getTime()).thenAnswer(new Answer() {
+			 public Object answer(InvocationOnMock invocation) {   
+			     return getCalendar().getTime();
+			 }
+		});
 		
 		systemUnderTest.processRequest(request, getCabListWithPriorSchedule());
 		Assert.assertEquals("Request Status invalid","Booked",request.getStatus());
@@ -107,6 +128,20 @@ public class ProcessRequestImplTest {
 		
 	}
 	
+	private static Calendar getCalendar(){
+		
+		Calendar c = Calendar.getInstance();
+		
+		if(c.get(Calendar.HOUR) > 20){
+			c.add(Calendar.HOUR, -10);
+		}
+		else if(c.get(Calendar.HOUR) < 4){
+			c.add(Calendar.HOUR, 10);
+		}
+		
+		return c;
+		
+	}
 	
 	private static List<BookingRequest> getBookingRequestList() {
 		
@@ -116,25 +151,25 @@ public class ProcessRequestImplTest {
 		req1.setBookingId("BR001");
 		req1.setPickUpArea(100025);
 		req1.setDropArea(100036);
-		req1.setPickUpTime(TimeGenerator.getDate("26/08/2015 10:45 pm"));
+		req1.setPickUpTime(TimeGenerator.getDate("27/08/2015 10:45 pm"));
 				
 		BookingRequest req2 = new BookingRequest();
 		req2.setBookingId("BR002");
 		req2.setPickUpArea(100056);
 		req2.setDropArea(100042);
-		req2.setPickUpTime(TimeGenerator.getDate("26/08/2015 10:00 pm"));
+		req2.setPickUpTime(TimeGenerator.getDate("27/08/2015 10:00 pm"));
 		
 		BookingRequest req3 = new BookingRequest();
 		req3.setBookingId("BR003");
 		req3.setPickUpArea(100044);
 		req3.setDropArea(100056);
-		req3.setPickUpTime(TimeGenerator.getDate("26/08/2015 11:00 pm"));
+		req3.setPickUpTime(TimeGenerator.getDate("27/08/2015 11:00 pm"));
 		
 		BookingRequest req4 = new BookingRequest();
 		req4.setBookingId("BR004");
 		req4.setPickUpArea(100028);
 		req4.setDropArea(100058);
-		req4.setPickUpTime(TimeGenerator.getDate("26/08/2015 11:30 pm"));
+		req4.setPickUpTime(TimeGenerator.getDate("27/08/2015 11:30 pm"));
 		
 		
 		list.add(req1);
@@ -186,7 +221,7 @@ private static List<Cab> getCabListWithPriorSchedule() {
 		schedule.setPickUpArea(100020);
 		schedule.setDropArea(100021);
 		
-		Calendar cal = Calendar.getInstance();
+		Calendar cal = getCalendar();
 		cal.add(Calendar.MINUTE,15);
 		
 		schedule.setPickUpTime(cal.getTime());
