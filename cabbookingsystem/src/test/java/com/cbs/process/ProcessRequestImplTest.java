@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +16,6 @@ import org.mockito.stubbing.Answer;
 import com.cbs.model.BookingRequest;
 import com.cbs.model.Cab;
 import com.cbs.model.Schedule;
-import com.cbs.utils.TimeGenerator;
 
 public class ProcessRequestImplTest {
 
@@ -31,8 +31,8 @@ public class ProcessRequestImplTest {
 		systemUnderTest = new ProcessRequestImpl();
 	}
 	
-	@Test
-	public void testOldProcessRequest() {
+//	@Test
+	public void testOldRequest() {
 		
 		BookingRequest request = new BookingRequest();
 		request.setBookingId("BR001");
@@ -43,19 +43,15 @@ public class ProcessRequestImplTest {
 		cal.add(Calendar.DATE, -1);
 		request.setPickUpTime(cal.getTime());
 		
-		Mockito.when(c.getTime()).thenAnswer(new Answer() {
-			 public Object answer(InvocationOnMock invocation) {   
-			     return getCalendar().getTime();
-			 }
-		});
-		
+		mockCalendar();
 		systemUnderTest.processRequest(request, getCabList());
 		Assert.assertEquals("Request Status invalid","-",request.getStatus() );
 		Assert.assertEquals("Request Status description invalid ","Only same day requests are served",request.getStatusDescription() );
 		
 	}
+
 	
-	@Test
+//	@Test
 	public void testExpiredRequest() {
 		
 		BookingRequest request = new BookingRequest();
@@ -66,17 +62,13 @@ public class ProcessRequestImplTest {
 		cal.add(Calendar.MINUTE, -50);
 		request.setPickUpTime(cal.getTime());
 		
-		Mockito.when(c.getTime()).thenAnswer(new Answer() {
-			 public Object answer(InvocationOnMock invocation) {   
-			     return getCalendar().getTime();
-			 }
-		});
+		mockCalendar();
 		systemUnderTest.processRequest(request, getCabList());
 		Assert.assertEquals("Request Status invalid","-",request.getStatus() );
 		Assert.assertEquals("Request Status description invalid ","Request cannot be completed as it is expired" ,request.getStatusDescription());
 	}
 	
-	@Test
+//	@Test
 	public void testRequestWithNoPriorSchedule() {
 		
 		BookingRequest request = new BookingRequest();
@@ -89,12 +81,7 @@ public class ProcessRequestImplTest {
 		
 		request.setPickUpTime(cal.getTime());
 		
-		Mockito.when(c.getTime()).thenAnswer(new Answer() {
-			 public Object answer(InvocationOnMock invocation) {   
-			     return getCalendar().getTime();
-			 }
-		});
-		
+		mockCalendar();		
 		systemUnderTest.processRequest(request, getCabList());
 		Assert.assertEquals("Request Status invalid","Booked",request.getStatus() );
 		Assert.assertEquals("Request Status description invalid ","Confirmed",request.getStatusDescription() );
@@ -102,9 +89,8 @@ public class ProcessRequestImplTest {
 		
 	}
 	
-	
-	@Test
-	public void testRequestWithPriorSchedule() {
+//	@Test
+	public void testRequestWithSinglePriorSchedule() {
 		
 		BookingRequest request = new BookingRequest();
 		request.setBookingId("BR001");
@@ -115,18 +101,52 @@ public class ProcessRequestImplTest {
 		cal.add(Calendar.MINUTE,50);
 		request.setPickUpTime(cal.getTime());
 		
-		Mockito.when(c.getTime()).thenAnswer(new Answer() {
-			 public Object answer(InvocationOnMock invocation) {   
-			     return getCalendar().getTime();
-			 }
-		});
-		
+		mockCalendar();
 		systemUnderTest.processRequest(request, getCabListWithPriorSchedule());
 		Assert.assertEquals("Request Status invalid","Booked",request.getStatus());
 		Assert.assertEquals("Request Status description invalid ","Confirmed" ,request.getStatusDescription());
 		Assert.assertEquals("Cab No invalid ","DL01HB001",request.getCabNo() );
 		
 	}
+	
+	@Test
+	public void testRequestWithMultiplePriorSchedule() {
+		
+		BookingRequest request = new BookingRequest();
+		request.setBookingId("BR006");
+		request.setPickUpArea(100050);
+		request.setDropArea(100057);
+		Calendar cal = getCalendar();
+		cal.add(Calendar.MINUTE,100);
+		request.setPickUpTime(cal.getTime());
+		
+		mockCalendar();
+		systemUnderTest.processRequest(request, getCabListWithPriorSchedule());
+		Assert.assertEquals("Request Status invalid","Booked",request.getStatus());
+		Assert.assertEquals("Request Status description invalid ","Confirmed" ,request.getStatusDescription());
+		Assert.assertEquals("Cab No invalid ","DL01HB002",request.getCabNo() );
+		
+	}
+	
+	@Test
+	public void testRequestWithSingleFutureSchedule() {
+		
+		BookingRequest request = new BookingRequest();
+		request.setBookingId("BR006");
+		request.setPickUpArea(100065);
+		request.setDropArea(100069);
+		Calendar cal = getCalendar();
+		cal.add(Calendar.MINUTE,100);
+		request.setPickUpTime(cal.getTime());
+		
+		mockCalendar();
+		systemUnderTest.processRequest(request, getCabListWithPriorSchedule());
+		Assert.assertEquals("Request Status invalid","Booked",request.getStatus());
+		Assert.assertEquals("Request Status description invalid ","Confirmed" ,request.getStatusDescription());
+		Assert.assertEquals("Cab No invalid ","DL01HB003",request.getCabNo() );
+		
+	}
+	
 	
 	private static Calendar getCalendar(){
 		
@@ -143,43 +163,14 @@ public class ProcessRequestImplTest {
 		
 	}
 	
-	private static List<BookingRequest> getBookingRequestList() {
-		
-		List<BookingRequest> list = new ArrayList<BookingRequest>();
-		
-		BookingRequest req1 = new BookingRequest();
-		req1.setBookingId("BR001");
-		req1.setPickUpArea(100025);
-		req1.setDropArea(100036);
-		req1.setPickUpTime(TimeGenerator.getDate("27/08/2015 10:45 pm"));
-				
-		BookingRequest req2 = new BookingRequest();
-		req2.setBookingId("BR002");
-		req2.setPickUpArea(100056);
-		req2.setDropArea(100042);
-		req2.setPickUpTime(TimeGenerator.getDate("27/08/2015 10:00 pm"));
-		
-		BookingRequest req3 = new BookingRequest();
-		req3.setBookingId("BR003");
-		req3.setPickUpArea(100044);
-		req3.setDropArea(100056);
-		req3.setPickUpTime(TimeGenerator.getDate("27/08/2015 11:00 pm"));
-		
-		BookingRequest req4 = new BookingRequest();
-		req4.setBookingId("BR004");
-		req4.setPickUpArea(100028);
-		req4.setDropArea(100058);
-		req4.setPickUpTime(TimeGenerator.getDate("27/08/2015 11:30 pm"));
-		
-		
-		list.add(req1);
-		list.add(req2);
-		list.add(req3);
-		list.add(req4);
-		
-		return list;
+	private void mockCalendar() {
+		Mockito.when(c.getTime()).thenAnswer(new Answer() {
+			 public Object answer(InvocationOnMock invocation) {   
+			     return getCalendar().getTime();
+			 }
+		});
 	}
-
+	
 	private static List<Cab> getCabList() {
 		
 		List<Cab> list = new ArrayList<Cab>();
@@ -212,21 +203,18 @@ public class ProcessRequestImplTest {
 		return list;
 	}
 	
-private static List<Cab> getCabListWithPriorSchedule() {
+	private static List<Cab> getCabListWithPriorSchedule() {
 		
 		List<Cab> list = new ArrayList<Cab>();
 		
 		Schedule schedule = new Schedule();
-		schedule.setBookingId("BR004");
+		schedule.setBookingId("BR005");
 		schedule.setPickUpArea(100020);
 		schedule.setDropArea(100021);
-		
 		Calendar cal = getCalendar();
 		cal.add(Calendar.MINUTE,15);
-		
 		schedule.setPickUpTime(cal.getTime());
-		
-		cal.add(Calendar.MINUTE, 2);
+		cal.add(Calendar.MINUTE, 17);
 		schedule.setDropTime(cal.getTime());
 		
 		Cab cab1 = new Cab();
@@ -237,15 +225,54 @@ private static List<Cab> getCabListWithPriorSchedule() {
 		schedulelist.add(schedule);
 		cab1.setScheduleList(schedulelist);
 		
+		schedulelist = new ArrayList<Schedule>();
+		
+		schedule = new Schedule();
+		schedule.setBookingId("BR005");
+		schedule.setPickUpArea(100040);
+		schedule.setDropArea(100047);
+		cal = getCalendar();
+		cal.add(Calendar.MINUTE,30);
+		schedule.setPickUpTime(cal.getTime());
+		cal.add(Calendar.MINUTE, 44);
+		schedule.setDropTime(cal.getTime());
+		schedulelist.add(schedule);
+		
+		schedule = new Schedule();
+		schedule.setBookingId("BR0010");
+		schedule.setPickUpArea(100060);
+		schedule.setDropArea(100065);
+		cal = getCalendar();
+		cal.add(Calendar.MINUTE,200);
+		schedule.setPickUpTime(cal.getTime());
+		cal.add(Calendar.MINUTE, 258);
+		schedule.setDropTime(cal.getTime());
+		schedulelist.add(schedule);
+		
 		Cab cab2 = new Cab();
 		cab2.setCabNo("DL01HB002");
 		cab2.setInitialLocation(100040);
 		cab2.setScheduleList(new ArrayList<Schedule>());
+		cab2.setScheduleList(schedulelist);
+		
+		
+		schedulelist = new ArrayList<Schedule>();
+		
+		schedule = new Schedule();
+		schedule.setBookingId("BR011");
+		schedule.setPickUpArea(100070);
+		schedule.setDropArea(100075);
+		cal = getCalendar();
+		cal.add(Calendar.MINUTE,200);
+		schedule.setPickUpTime(cal.getTime());
+		cal.add(Calendar.MINUTE, 210);
+		schedule.setDropTime(cal.getTime());
+		schedulelist.add(schedule);
 		
 		Cab cab3 = new Cab();
 		cab3.setCabNo("DL01HB003");
-		cab3.setInitialLocation(100060);
-		cab3.setScheduleList(new ArrayList<Schedule>());
+		cab3.setInitialLocation(100065);
+		cab3.setScheduleList(schedulelist);
 		
 		Cab cab4 = new Cab();
 		cab4.setCabNo("DL01HB004");
@@ -260,4 +287,9 @@ private static List<Cab> getCabListWithPriorSchedule() {
 		return list;
 	}
 
+	@After
+	public void tearDown(){
+		
+	}
+	
 }

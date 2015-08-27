@@ -98,32 +98,26 @@ public class ProcessRequestImpl implements ProcessRequest{
 						nextSchedule = scheduleIterator.next();
 					}
 					
-					if(prevschedule!=null && prevschedule.getDropTime().before(request.getPickUpTime()) && nextSchedule == null){
+					if(prevschedule!=null  && nextSchedule == null){
 						
-						schedule = getCabSchedule(prevschedule.getDropArea(),prevschedule,request);
+						if(prevschedule.getDropTime().before(request.getPickUpTime())){
+							
+							schedule = getCabSchedule(prevschedule.getDropArea(),prevschedule,request);
+							
+						}
+						else if(prevschedule.getDropTime().after(request.getPickUpTime())){
+							
+							schedule = getCabSchedule(cab.getInitialLocation(),request);
+							verifyScheduleCanBeIncluded(schedule,prevschedule);
+						}
 					}
 					else if (prevschedule!=null && prevschedule.getDropTime().before(request.getPickUpTime()) && nextSchedule != null ){
-						
+					
 						schedule = getCabSchedule(prevschedule.getDropArea(),prevschedule,request);
-						
-						if(nextSchedule.getPickUpTime().after(schedule.getDropTime())){
-							
-							schedule = getCabSchedule(nextSchedule.getDropArea(),schedule,request);
-							
-						}else if(nextSchedule.getPickUpTime().before(schedule.getDropTime())){
-							
-							schedule = getCabSchedule(schedule.getDropArea(),nextSchedule,request);
-							
-						}
-						else{
-							
-							schedule = null;
-							
-						}
+						verifyScheduleCanBeIncluded(schedule,nextSchedule);
 						
 					}
 				}
-				
 			
 			}
 			else{
@@ -137,6 +131,25 @@ public class ProcessRequestImpl implements ProcessRequest{
 				finalScheduleMap.put(cab.getCabNo(),schedule);
 			}
 		}
+	}
+
+	private void verifyScheduleCanBeIncluded(Schedule schedule,Schedule nextschedule) {
+		
+		if(schedule!=null){
+			
+			int distance = Math.abs(nextschedule.getPickUpArea()-schedule.getDropArea());
+			
+			Date futureReportingTime = TimeGenerator.getDifferentTime(schedule.getDropTime(),distance * Constants.TIME_TAKEN_TO_TRAVEL_1_KM);
+			
+			int timeDiff = TimeGenerator.getTimeDifference(nextschedule.getPickUpTime(),futureReportingTime); 
+			
+			if(timeDiff < 15){
+				
+				schedule = null;
+			}
+			
+		}
+		
 	}
 
 	private Schedule getCabSchedule(int location,BookingRequest request) {
