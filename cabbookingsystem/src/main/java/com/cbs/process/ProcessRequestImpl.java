@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import com.cbs.constants.Constants;
 import com.cbs.model.BookingRequest;
@@ -81,14 +81,49 @@ public class ProcessRequestImpl implements ProcessRequest{
 		for(Cab cab:availableCabsList){
 			
 			Schedule schedule = null;
+			Schedule prevschedule = null;
+			Schedule nextSchedule = null;
+			
 			List<Schedule> scheduleList = cab.getScheduleList();
 			
 			if(scheduleList.size()!=0){
 				
-				for(int i = 0;i<scheduleList.size();i++){
+				Iterator<Schedule> scheduleIterator = scheduleList.listIterator();
+				while(scheduleIterator.hasNext()){
+				
+					prevschedule = scheduleIterator.next();
 					
-					schedule = getCabSchedule(scheduleList.get(i).getDropArea(),scheduleList.get(i),request);
+					if(scheduleIterator.hasNext()){
+						
+						nextSchedule = scheduleIterator.next();
+					}
+					
+					if(prevschedule!=null && prevschedule.getDropTime().before(request.getPickUpTime()) && nextSchedule == null){
+						
+						schedule = getCabSchedule(prevschedule.getDropArea(),prevschedule,request);
+					}
+					else if (prevschedule!=null && prevschedule.getDropTime().before(request.getPickUpTime()) && nextSchedule != null ){
+						
+						schedule = getCabSchedule(prevschedule.getDropArea(),prevschedule,request);
+						
+						if(nextSchedule.getPickUpTime().after(schedule.getDropTime())){
+							
+							schedule = getCabSchedule(nextSchedule.getDropArea(),schedule,request);
+							
+						}else if(nextSchedule.getPickUpTime().before(schedule.getDropTime())){
+							
+							schedule = getCabSchedule(schedule.getDropArea(),nextSchedule,request);
+							
+						}
+						else{
+							
+							schedule = null;
+							
+						}
+						
+					}
 				}
+				
 			
 			}
 			else{
