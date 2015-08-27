@@ -22,12 +22,16 @@ public class Main {
 			List<Cab> cabList = getCabList();
 			List<BookingRequest> requestList = getBookingRequestList();
 			
+			System.out.println("-----------------------Booking Details-----------------------------------");
+			
 			for(BookingRequest request:requestList){
 				
 				requestHandler.processRequest(request, cabList);
 				System.out.println(request.toString());
 			}
 			
+			System.out.println("\n");
+			System.out.println("-----------------------Cab Schedule Details-----------------------------------");
 			for(Cab request:cabList){
 				
 				System.out.println(request.toString());

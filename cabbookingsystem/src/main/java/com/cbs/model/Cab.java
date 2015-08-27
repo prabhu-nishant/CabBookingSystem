@@ -52,24 +52,24 @@ public class Cab {
 	public String toString(){
 		
 		StringBuilder str = new StringBuilder();
-		str.append("\n----------------------------");
 				
 		str.append("\nCab No :"+cabNo);
 		str.append("\ninitialLocation :"+initialLocation);
+		str.append("\n");
+		str.append("\nSchedule :");
 		
 		for(Schedule schedule:scheduleList){
 			
-			str.append("\nbookingId :"+schedule.getBookingId());
+			str.append("\n\nbookingId :"+schedule.getBookingId());
 			str.append("\npickUpArea :"+schedule.getPickUpArea());
 			str.append("\ndropArea :"+schedule.getDropArea());
 			str.append("\npickUpTime :"+schedule.getPickUpTime());
 			str.append("\ndropTime :"+schedule.getDropTime());
 			str.append("\nstatus :"+schedule.getStatus());
 			str.append("\nprofit :"+schedule.getProfit());
-			str.append("\n----------------------------");
 		}
 		
-		str.append("\n----------------------------");
+		str.append("\n-----------------------------------------------------------------------------");
 				
 		return str.toString();
 		
