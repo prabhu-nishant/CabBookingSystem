@@ -45,10 +45,6 @@ public class Cab {
 		this.scheduleList = scheduleList;
 	}
 	
-	public void addToScheduleList(Schedule schedule) {
-		this.scheduleList.add(schedule);
-	}
-	
 	public String toString(){
 		
 		StringBuilder str = new StringBuilder();
