@@ -31,7 +31,7 @@ public class ProcessRequestImplTest {
 		systemUnderTest = new ProcessRequestImpl();
 	}
 	
-//	@Test
+	@Test
 	public void testOldRequest() {
 		
 		BookingRequest request = new BookingRequest();
@@ -51,7 +51,7 @@ public class ProcessRequestImplTest {
 	}
 
 	
-//	@Test
+	@Test
 	public void testExpiredRequest() {
 		
 		BookingRequest request = new BookingRequest();
@@ -59,7 +59,7 @@ public class ProcessRequestImplTest {
 		request.setPickUpArea(100025);
 		request.setDropArea(100036);
 		Calendar cal = getCalendar();
-		cal.add(Calendar.MINUTE, -50);
+		cal.add(Calendar.MINUTE,-55);
 		request.setPickUpTime(cal.getTime());
 		
 		mockCalendar();
@@ -68,7 +68,7 @@ public class ProcessRequestImplTest {
 		Assert.assertEquals("Request Status description invalid ","Request cannot be completed as it is expired" ,request.getStatusDescription());
 	}
 	
-//	@Test
+	@Test
 	public void testRequestWithNoPriorSchedule() {
 		
 		BookingRequest request = new BookingRequest();
@@ -89,7 +89,7 @@ public class ProcessRequestImplTest {
 		
 	}
 	
-//	@Test
+	@Test
 	public void testRequestWithSinglePriorSchedule() {
 		
 		BookingRequest request = new BookingRequest();
@@ -151,12 +151,11 @@ public class ProcessRequestImplTest {
 	private static Calendar getCalendar(){
 		
 		Calendar c = Calendar.getInstance();
-		
-		if(c.get(Calendar.HOUR) > 20){
-			c.add(Calendar.HOUR, -10);
+		if(c.get(Calendar.HOUR_OF_DAY) > 20){
+			c.add(Calendar.HOUR_OF_DAY, -10);
 		}
-		else if(c.get(Calendar.HOUR) < 4){
-			c.add(Calendar.HOUR, 10);
+		else if(c.get(Calendar.HOUR_OF_DAY) < 4){
+			c.add(Calendar.HOUR_OF_DAY, 10);
 		}
 		
 		return c;
